@@ -24,7 +24,7 @@ content = []
 content.append("time={}".format(time.asctime(time.localtime(time.time()))))
 content.append("host={}".format(socket.gethostname()))
 with open('/proc/uptime', 'r') as f:
-        content.append("uptime={}".format(str(timedelta(seconds = float(f.readline().split()[0])))))
+        content.append("uptime={}".format(timedelta(seconds = float(f.readline().split()[0]))))
 content.append(os.popen("/opt/vc/bin/vcgencmd measure_temp").readline().rstrip('\n'))
 
 msg = MIMEMultipart()
