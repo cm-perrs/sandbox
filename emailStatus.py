@@ -6,7 +6,7 @@ from email.MIMEText import MIMEText
 import smtplib
 import os.path
 from datetime import timedelta
-from time import gmtime, strftime
+import time
 import socket
 
 if not os.path.isfile('address.txt'):
@@ -21,11 +21,11 @@ if len(recipients) < 1:
 sender = recipients[0]
 
 content = []
-content.append(os.popen("/opt/vc/bin/vcgencmd measure_temp").readline().rstrip('\n'))
+content.append("time={}".format(time.asctime(time.localtime(time.time()))))
+content.append("host={}".format(socket.gethostname()))
 with open('/proc/uptime', 'r') as f:
-        content.append(str(timedelta(seconds = float(f.readline().split()[0]))))
-content.append(socket.gethostname())
-content.append(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
+        content.append("uptime={}".format(str(timedelta(seconds = float(f.readline().split()[0])))))
+content.append(os.popen("/opt/vc/bin/vcgencmd measure_temp").readline().rstrip('\n'))
 
 msg = MIMEMultipart()
 msg['From'] = sender
