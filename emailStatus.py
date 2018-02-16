@@ -21,7 +21,7 @@ if len(recipients) < 1:
 sender = recipients[0]
 
 content = []
-content.append(os.popen("vcgencmd measure_temp").readline().rstrip('\n'))
+content.append(os.popen("/opt/vc/bin/vcgencmd measure_temp").readline().rstrip('\n'))
 with open('/proc/uptime', 'r') as f:
         content.append(str(timedelta(seconds = float(f.readline().split()[0]))))
 content.append(socket.gethostname())
