@@ -8,17 +8,13 @@ import os.path
 from datetime import timedelta
 import time
 import socket
+import ConfigParser
 
-if not os.path.isfile('address.txt'):
-        print('Error opening address.txt file.')
-        quit()
-
-recipients = [line.rstrip('\n') for line in open('address.txt')]
-if len(recipients) < 1:
-        print('address.txt file must contain one email.')
-        quit()
-
-sender = recipients[0]
+parser = ConfigParser.ConfigParser()
+parser.read("config.ini")
+server = parser.get('global', 'server')
+sender = parser.get('global', 'sender')
+recipients = [e.strip() for e in parser.get('global', 'recipients').split(',')]
 
 content = []
 content.append("time={}".format(time.asctime(time.localtime(time.time()))))
@@ -29,10 +25,15 @@ content.append(os.popen("/opt/vc/bin/vcgencmd measure_temp").readline().rstrip('
 
 msg = MIMEMultipart()
 msg['From'] = sender
-msg['To'] = ", ".join(recipients)
+msg['Bcc'] = ", ".join(recipients)
 msg['Subject'] = "Raspberry PI status"
 body = "\r\n".join(content)
 msg.attach(MIMEText(body, 'plain'))
-server = smtplib.SMTP('aspmx.l.google.com')
-server.sendmail(sender, recipients, msg.as_string())
-server.quit()
+
+try:
+        server = smtplib.SMTP_SSL(server, 465)
+        server.sendmail(sender, recipients, msg.as_string())
+        server.quit()
+except:
+        print "An email error occured."
+        pass
